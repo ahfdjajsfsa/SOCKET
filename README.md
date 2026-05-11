@@ -1,0 +1,2 @@
+windows环境。
+本文件下我们将利用SOCKET API实现局域网TCP通信服务端和客户端。

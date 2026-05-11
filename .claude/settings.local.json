@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(javac Client.java Server.java)"
+      "Bash(javac Client.java Server.java)",
+      "Bash(javac Server.java Client.java)"
     ]
   }
 }

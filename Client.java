@@ -1,25 +1,37 @@
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class Client {
     public static void main(String[] args) {
-        try (Socket clientSocket = new Socket("127.0.0.1", 8080)) {
+        try (Socket clientSocket = new Socket("127.0.0.1", 8080);
+                Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8)) {
             System.out.println("Connected to server!");
+            System.out.println("Enter message, or enter exit to quit.");
 
-            OutputStream outputStream = clientSocket.getOutputStream();
-            byte[] message = "Hello, server!".getBytes(StandardCharsets.UTF_8);
-            outputStream.write(message);
-            outputStream.flush();
+            while (true) {
+                System.out.print("> ");
+                String message = scanner.nextLine();
 
-            InputStream inputStream = clientSocket.getInputStream();
-            byte[] buffer = new byte[1024];
-            int recvLen = inputStream.read(buffer, 0, buffer.length - 1);
+                if ("exit".equalsIgnoreCase(message)) {
+                    break;
+                }
 
-            if (recvLen > 0) {
-                String reply = new String(buffer, 0, recvLen, StandardCharsets.UTF_8);
+                writer.println(message);
+                String reply = reader.readLine();
+
+                if (reply == null) {
+                    System.out.println("Server disconnected.");
+                    break;
+                }
+
                 System.out.println("Received from server: " + reply);
             }
         } catch (IOException e) {
